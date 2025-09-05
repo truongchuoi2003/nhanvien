@@ -3,14 +3,15 @@
  *
  * A user who can log in to this application.
  */
-
+const bcrypt = require('bcrypt')
 module.exports = {
 
   attributes: {
 
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
-    //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
+    //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝ 
+    role: { type: 'string', isIn: ['user','admin'], defaultsTo: 'user' },
 
     emailAddress: {
       type: 'string',
@@ -155,17 +156,36 @@ without necessarily having a billing card.`
       example: 1502844074211
     },
 
-    //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
-    //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
-    //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝
-    // n/a
-
-    //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
-    //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
-    //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
-    // n/a
+    // Ẩn mật khẩu khi trả JSON
+    customToJSON: function() {
+      return _.omit(this, ['password']);
+    },
 
   },
 
+  // Lifecycle callbacks để hash password
+  beforeCreate: async function(valuesToSet, proceed) {
+    if (valuesToSet.password) {
+      try {
+        const salt = await bcrypt.genSalt(10);
+        valuesToSet.password = await bcrypt.hash(valuesToSet.password, salt);
+      } catch (err) {
+        return proceed(err);
+      }
+    }
+    return proceed();
+  },
+
+  beforeUpdate: async function(valuesToSet, proceed) {
+    if (valuesToSet.password) {
+      try {
+        const salt = await bcrypt.genSalt(10);
+        valuesToSet.password = await bcrypt.hash(valuesToSet.password, salt);
+      } catch (err) {
+        return proceed(err);
+      }
+    }
+    return proceed();
+  },
 
 };
