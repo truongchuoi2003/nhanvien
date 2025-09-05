@@ -60,7 +60,7 @@ module.exports.bootstrap = async function() {
 
   // By convention, this is a good place to set up fake data during development.
   await User.createEach([
-    { emailAddress: 'admin@example.com', fullName: 'Ryan Dahl', isSuperAdmin: true, password: await sails.helpers.passwords.hashPassword('abc123') },
+    { emailAddress: 'superadmin@example.com', fullName: 'Truong', isSuperAdmin: true, password: await sails.helpers.passwords.hashPassword('truong') },
   ]);
 
   // Save new bootstrap version
@@ -76,4 +76,14 @@ module.exports.bootstrap = async function() {
     sails.log.warn('For some reason, could not write bootstrap version .json file.  This could be a result of a problem with your configured paths, or, if you are in production, a limitation of your hosting provider related to `pwd`.  As a workaround, try updating app.js to explicitly pass in `appPath: __dirname` instead of relying on `chdir`.  Current sails.config.appPath: `'+sails.config.appPath+'`.  Full error details: '+err.stack+'\n\n(Proceeding anyway this time...)');
   });
 
+  const admin = await User.findOne({ emailAddress: 'superadmin@example.com' });
+  if (!admin) {
+    await User.create({
+      emailAddress: 'superadmin@example.com',
+      fullName: 'Super Admin',
+      password: await sails.helpers.passwords.hashPassword('truong'),
+      role: 'admin'
+    });
+    sails.log('Admin mặc định đã được tạo: superadmin@example.com / truong');
+  }
 };

@@ -9,20 +9,10 @@
  *   https://sailsjs.com/docs/concepts/policies/access-control-and-permissions
  */
 module.exports = async function (req, res, proceed) {
-  if (!req.me) {
-    return res.forbidden('Bạn chưa đăng nhập');
+  if (!req.me || req.me.role !== 'superadmin') {
+    return res.forbidden('Bạn không có quyền thực hiện hành động này');
   }
-
-  // Admin thì luôn cho qua
-  if (req.me.role === 'admin') {
-    return proceed();
-  }
-
-  // User chỉ được phép xem thông tin của chính mình
-  if (req.me.id === req.param('id')) {
-    return proceed();
-  }
-
-  return res.forbidden('Bạn chỉ có thể xem thông tin của mình');
+  return proceed();
 };
+
 

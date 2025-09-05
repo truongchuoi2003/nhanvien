@@ -3,7 +3,7 @@
  *
  * A user who can log in to this application.
  */
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 module.exports = {
 
   attributes: {
@@ -11,7 +11,11 @@ module.exports = {
     //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
     //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
     //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝ 
-    role: { type: 'string', isIn: ['user','admin'], defaultsTo: 'user' },
+    role: { 
+      type: 'string', 
+      isIn: ['user', 'admin', 'superadmin'], 
+      defaultsTo: 'user' 
+    },
 
     emailAddress: {
       type: 'string',
@@ -27,12 +31,12 @@ module.exports = {
       isIn: ['unconfirmed', 'change-requested', 'confirmed'],
       defaultsTo: 'confirmed',
       description: 'The confirmation status of the user\'s email address.',
-      extendedDescription:
-`Users might be created as "unconfirmed" (e.g. normal signup) or as "confirmed" (e.g. hard-coded
-admin users).  When the email verification feature is enabled, new users created via the
-signup form have \`emailStatus: 'unconfirmed'\` until they click the link in the confirmation email.
-Similarly, when an existing user changes their email address, they switch to the "change-requested"
-email status until they click the link in the confirmation email.`
+      extendedDescription: `
+        Users might be created as "unconfirmed" (e.g. normal signup) or as "confirmed" (e.g. hard-coded
+        admin users).  When the email verification feature is enabled, new users created via the
+        signup form have \`emailStatus: 'unconfirmed'\` until they click the link in the confirmation email.
+        Similarly, when an existing user changes their email address, they switch to the "change-requested"
+        email status until they click the link in the confirmation email.`
     },
 
     emailChangeCandidate: {
@@ -57,22 +61,15 @@ email status until they click the link in the confirmation email.`
       example: 'Mary Sue van der McHenst'
     },
 
+    // Thêm phần role: user, admin, superadmin
     isSuperAdmin: {
       type: 'boolean',
       description: 'Whether this user is a "super admin" with extra permissions, etc.',
-      extendedDescription:
-`Super admins might have extra permissions, see a different default home page when they log in,
-or even have a completely different feature set from normal users.  In this app, the \`isSuperAdmin\`
-flag is just here as a simple way to represent two different kinds of users.  Usually, it's a good idea
-to keep the data model as simple as possible, only adding attributes when you actually need them for
-features being built right now.
-
-For example, a "super admin" user for a small to medium-sized e-commerce website might be able to
-change prices, deactivate seasonal categories, add new offerings, and view live orders as they come in.
-On the other hand, for an e-commerce website like Walmart.com that has undergone years of development
-by a large team, those administrative features might be split across a few different roles.
-
-So, while this \`isSuperAdmin\` demarcation might not be the right approach forever, it's a good place to start.`
+      extendedDescription: `
+        Super admins might have extra permissions, see a different default home page when they log in,
+        or even have a completely different feature set from normal users.  In this app, the \`isSuperAdmin\`
+        flag is just here as a simple way to represent three different kinds of users.  
+        A super admin might have the ability to manage users, view all data, and more.`
     },
 
     passwordResetToken: {
@@ -101,18 +98,18 @@ So, while this \`isSuperAdmin\` demarcation might not be the right approach fore
       type: 'string',
       protect: true,
       description: 'The id of the customer entry in Stripe associated with this user (or empty string if this user is not linked to a Stripe customer -- e.g. if billing features are not enabled).',
-      extendedDescription:
-`Just because this value is set doesn't necessarily mean that this user has a billing card.
-It just means they have a customer entry in Stripe, which might or might not have a billing card.`
+      extendedDescription: `
+        Just because this value is set doesn't necessarily mean that this user has a billing card.
+        It just means they have a customer entry in Stripe, which might or might not have a billing card.`
     },
 
     hasBillingCard: {
       type: 'boolean',
       description: 'Whether this user has a default billing card hooked up as their payment method.',
-      extendedDescription:
-`More specifically, this indcates whether this user record's linked customer entry in Stripe has
-a default payment source (i.e. credit card).  Note that a user have a \`stripeCustomerId\`
-without necessarily having a billing card.`
+      extendedDescription: `
+        More specifically, this indicates whether this user record's linked customer entry in Stripe has
+        a default payment source (i.e. credit card). Note that a user can have a \`stripeCustomerId\`
+        without necessarily having a billing card.`
     },
 
     billingCardBrand: {
